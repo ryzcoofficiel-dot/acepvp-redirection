@@ -146,7 +146,7 @@ async function submitRating() {
   setMsg("Envoi en cours...");
 
   try {
-    const res = await fetch(`${WORKER_API_BASE.replace(/\/$/, "")}/rate`, {
+    const res = await fetch(`${WORKER_API_BASE.replace(/\/$/, "https://acepvp-ratings.ryzcoofficiel.workers.dev")}/rate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
