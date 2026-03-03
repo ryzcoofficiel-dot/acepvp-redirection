@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Votre avis | ACEPVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <main class="wrap">
+    <section class="card" aria-label="Notation">
+      <header class="head">
+        <img class="logo" src="assets/ace_logo.png" alt="ACEPVP" />
+        <div class="head__txt">
+          <p class="kicker">Merci pour votre achat</p>
+          <h1>Notez votre expérience</h1>
+          <p class="sub">Choisissez l’article concerné, puis laissez une note.</p>
+        </div>
+      </header>
+
+      <div class="grid" id="productsGrid" aria-label="Liste des articles"></div>
+
+      <div class="form">
+        <div class="field">
+          <label class="label" for="comment">Commentaire (optionnel)</label>
+          <textarea id="comment" class="textarea" rows="4" placeholder="Écrivez votre commentaire..."></textarea>
+        </div>
+
+        <div class="rateRow" aria-label="Notation">
+          <div class="rateLabel">
+            <span class="label">Votre note</span>
+            <span class="hint" id="rateHint">Sélectionnez 1 à 5 étoiles</span>
+          </div>
+          <div class="stars" id="stars" role="radiogroup" aria-label="Note en étoiles"></div>
+        </div>
+
+        <button class="btn" id="submitBtn" type="button">Envoyer ma note</button>
+        <p class="msg" id="msg" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

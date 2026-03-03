@@ -1,0 +1,7 @@
+name = "acepvp-ratings"
+main = "worker.js"
+compatibility_date = "2026-03-03"
+
+kv_namespaces = [
+  { binding = "RATINGS_KV", id = "73845ae3762942ff9679d00049cf8404", preview_id = "7688d0b180d9446e8e5e5c5a3840638f" }
+]

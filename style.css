@@ -1,0 +1,177 @@
+:root{
+  --bg:#070a12;
+  --card:rgba(14,18,34,.78);
+  --stroke:rgba(255,255,255,.08);
+  --txt:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.72);
+  --pink:#ff4fd8;
+  --pink2:#ff2aa8;
+  --cyan:#4bf1ff;
+  --shadow: 0 30px 90px rgba(0,0,0,.55);
+  --r:22px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--txt);
+  font-family:Rajdhani,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  overflow-x:hidden;
+}
+
+.bg{
+  position:fixed;inset:0;pointer-events:none;
+  background:
+    radial-gradient(900px 600px at 15% 10%, rgba(255,79,216,.20), transparent 55%),
+    radial-gradient(900px 700px at 90% 25%, rgba(75,241,255,.16), transparent 55%),
+    radial-gradient(900px 700px at 50% 95%, rgba(255,42,168,.14), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.04), transparent 30%),
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.22), transparent 40%),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,.18), transparent 40%);
+  filter:saturate(1.2);
+}
+
+.wrap{min-height:100%;display:grid;place-items:center;padding:28px}
+
+.card{
+  width:min(980px,100%);
+  border-radius:var(--r);
+  background:var(--card);
+  border:1px solid var(--stroke);
+  box-shadow:var(--shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow:hidden;
+  position:relative;
+}
+.card:before{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(135deg, rgba(255,79,216,.14), transparent 35%, rgba(75,241,255,.10));
+  pointer-events:none;
+}
+
+.head{display:flex;gap:18px;align-items:center;padding:22px 22px 10px;position:relative}
+.logo{width:62px;height:62px;object-fit:contain;filter:drop-shadow(0 10px 28px rgba(255,79,216,.22))}
+.kicker{margin:0;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;font-weight:700;font-size:.82rem}
+.head h1{margin:2px 0 0;font-family:Orbitron,system-ui,sans-serif;font-weight:800;letter-spacing:.02em;font-size:1.4rem}
+.sub{margin:8px 0 0;color:var(--muted)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+  padding:14px 22px 22px;
+  position:relative;
+}
+
+@media (max-width: 980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width: 640px){.grid{grid-template-columns:1fr}.head{flex-direction:column;align-items:flex-start}}
+
+.pCard{
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(8,10,18,.45);
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  position:relative;
+}
+.pCard:hover{transform:translateY(-2px);border-color:rgba(255,79,216,.42);box-shadow:0 22px 55px rgba(0,0,0,.45)}
+.pCard.is-active{border-color:rgba(75,241,255,.55);box-shadow:0 26px 70px rgba(0,0,0,.55)}
+
+.pImg{height:120px;background:rgba(0,0,0,.25);display:grid;place-items:center}
+.pImg img{width:100%;height:100%;object-fit:cover}
+.pBody{padding:12px 12px 12px}
+.pTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pName{margin:0;font-weight:700;font-size:1.06rem;line-height:1.1}
+.pCat{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+.badge{
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.88);
+}
+.badge--coins{border-color:rgba(255,79,216,.35);background:rgba(255,79,216,.10)}
+.badge--vehicles{border-color:rgba(75,241,255,.35);background:rgba(75,241,255,.09)}
+.badge--offers{border-color:rgba(255,255,255,.22)}
+
+.form{padding:0 22px 22px;position:relative}
+.field{display:flex;flex-direction:column;gap:8px;margin:0 0 14px}
+.label{font-weight:800;letter-spacing:.02em}
+.textarea{
+  width:100%;
+  border-radius:16px;
+  background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,255,255,.12);
+  color:var(--txt);
+  padding:12px 12px;
+  resize:vertical;
+  min-height:92px;
+  outline:none;
+}
+.textarea:focus{border-color:rgba(255,79,216,.55);box-shadow:0 0 0 4px rgba(255,79,216,.10)}
+
+.rateRow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 16px}
+.rateLabel{display:flex;flex-direction:column;gap:4px}
+.hint{color:var(--muted);font-size:.95rem}
+
+.stars{display:flex;gap:10px;align-items:center}
+.starBtn{
+  width:38px;height:38px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.22);
+  display:grid;place-items:center;
+  cursor:pointer;
+  transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.starBtn:hover{transform:translateY(-1px);border-color:rgba(255,79,216,.55);box-shadow:0 12px 26px rgba(0,0,0,.40)}
+.starBtn svg{width:22px;height:22px;fill:rgba(255,255,255,.22)}
+.starBtn.is-on svg{fill:var(--pink)}
+.starBtn.is-hot svg{fill:var(--pink2)}
+
+.btn{
+  width:100%;
+  border:none;
+  border-radius:16px;
+  padding:14px 14px;
+  font-family:Orbitron,system-ui,sans-serif;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  cursor:pointer;
+  background:linear-gradient(90deg, rgba(255,79,216,.95), rgba(75,241,255,.85));
+  color:#050713;
+  box-shadow:0 24px 60px rgba(0,0,0,.55);
+  transition:transform .14s ease, filter .14s ease;
+}
+.btn:hover{transform:translateY(-1px);filter:saturate(1.1)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+.btn--ghost{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  background:rgba(0,0,0,.22);
+  color:var(--txt);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:none;
+  width:auto;
+  padding:14px 18px;
+}
+.btn--ghost:hover{filter:none;transform:translateY(-1px);border-color:rgba(255,79,216,.42)}
+
+.msg{margin:10px 0 0;color:var(--muted);min-height:1.2em}
+
+.card--thanks{max-width:720px}
+.thanks{padding:32px 22px 28px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;position:relative}
+.thanks h1{margin:6px 0 0;font-family:Orbitron,system-ui,sans-serif;font-weight:900}
+.thanks p{margin:0;color:var(--muted);font-size:1.06rem}

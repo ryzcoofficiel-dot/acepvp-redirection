@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merci | ACEPVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    (function(){
+      try{
+        if(!localStorage.getItem('acepvp_rating_done')){ location.replace('index.html'); }
+        history.replaceState(null,'',location.href);
+      }catch(e){}
+    })();
+  </script>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <main class="wrap">
+    <section class="card card--thanks" aria-label="Merci">
+      <div class="thanks">
+        <img class="logo" src="assets/ace_logo.png" alt="ACEPVP" />
+        <h1>Merci pour votre note !</h1>
+        <p>Votre avis a bien été enregistré.</p>
+        <a class="btn btn--ghost" href="https://discord.gg/acepvp" target="_blank" rel="noopener noreferrer">Rejoindre le Discord</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
