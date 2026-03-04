@@ -1,132 +1,146 @@
-const WORKER_API_BASE = "https://YOUR_WORKER_SUBDOMAIN.workers.dev";
+const WORKER_API_BASE = "https://acepvp-ratings.ryzcoofficiel.workers.dev";
+
+const LS_KEY = "acepvp_rating_sent_v1";
 
 const PRODUCTS = [
-  { id: "coins_500", name: "500 AceCoins", category: "AceCoins", badge: "coins", image: "assets/ace_logo.png" },
-  { id: "coins_1000", name: "1000 AceCoins", category: "AceCoins", badge: "coins", image: "assets/ace_logo.png" },
-  { id: "coins_2000", name: "2000 AceCoins", category: "AceCoins", badge: "coins", image: "assets/ace_logo.png" },
-  { id: "coins_5000", name: "5000 AceCoins", category: "AceCoins", badge: "coins", image: "assets/ace_logo.png" },
-  { id: "coins_10000", name: "10000 AceCoins", category: "AceCoins", badge: "coins", image: "assets/ace_logo.png" },
-
-  { id: "vehicle_21x90", name: "2021 X90 Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/x90_2021.png" },
-  { id: "vehicle_mk2s95", name: "Karin S95 Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/karin_s95.png" },
-  { id: "vehicle_mk2baggeds95", name: "Karin S95 Bagged Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/karin_s95_bagged.png" },
-  { id: "vehicle_smash_schafter3", name: "Benefactor Schafter RS Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/benefactor_schafter.png" },
-  { id: "vehicle_scharmann", name: "Benefactor Scharmann Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/benefactor_scharmann.png" },
-  { id: "vehicle_sentinel_rts", name: "Ubermacht Sentinel RTS Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/ubermacht_sentinel_rts.png" },
-  { id: "vehicle_growlerc", name: "Growler Custom Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/growler_custom.png" },
-  { id: "vehicle_elegysa", name: "Annis Elegy SA Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/annis_elegy.png" },
-  { id: "vehicle_weevb", name: "Baja Weevil Blindée", category: "Véhicules blindés", badge: "vehicles", image: "assets/vehicles/baja_weevil.png" },
-
-  { id: "offer_unban", name: "Unban ACEPVP", category: "VIP & Services", badge: "offers", image: "assets/products/unban.png" },
-  { id: "offer_vip", name: "VIP AcePvP", category: "VIP & Services", badge: "offers", image: "assets/products/vip_acepvp.png" }
+  { id: "vip_acepvp_service", name: "VIP AcePvP Service", image: "assets/vip.jpg" },
+  { id: "coins_500", name: "500 AceCoins", image: "images/coins/500.png" },
+  { id: "coins_1000", name: "1000 AceCoins", image: "images/coins/1000.png" },
+  { id: "coins_2000", name: "2000 AceCoins", image: "images/coins/2000.png" },
+  { id: "coins_5000", name: "5000 AceCoins", image: "images/coins/5000.png" },
+  { id: "coins_10000", name: "10 000 AceCoins", image: "images/coins/10000.png" }
 ];
-
-const LS_KEY = "acepvp_rating_done";
 
 let selectedProductId = null;
 let selectedStars = 0;
-let hotStars = 0;
 
-window.addEventListener("DOMContentLoaded", () => {
+function $(sel) {
+  return document.querySelector(sel);
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function safeText(resp) {
+  return resp.text().catch(() => "");
+}
+
+function setMsg(text) {
+  const el = $("#msg");
+  if (!el) return;
+  el.textContent = text || "";
+}
+
+function alreadySent() {
   try {
-    if (localStorage.getItem(LS_KEY)) {
-      location.replace("merci.html");
-      return;
-    }
-  } catch (e) {}
+    const v = localStorage.getItem(LS_KEY);
+    if (!v) return false;
+    const obj = JSON.parse(v);
+    return !!obj?.ok;
+  } catch {
+    return false;
+  }
+}
 
-  renderProducts();
-  renderStars();
+function markSent(itemId) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ ok: true, at: Date.now(), itemId }));
+  } catch {}
+}
 
-  document.getElementById("submitBtn").addEventListener("click", submitRating);
-});
+function starSvg(filled) {
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+        ${filled ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="1.6"'} />
+    </svg>
+  `;
+}
 
-function renderProducts() {
-  const grid = document.getElementById("productsGrid");
-  grid.innerHTML = PRODUCTS.map((p) => {
-    return `
-      <article class="pCard" data-product-id="${escapeAttr(p.id)}" tabindex="0" role="button" aria-label="${escapeAttr(p.name)}">
-        <div class="pImg"><img src="${escapeAttr(p.image)}" alt="${escapeAttr(p.name)}" loading="lazy" onerror="this.src='assets/ace_logo.png'" /></div>
-        <div class="pBody">
-          <div class="pTop">
-            <div>
-              <p class="pName">${escapeHtml(p.name)}</p>
-              <p class="pCat">${escapeHtml(p.category)}</p>
-            </div>
-            <span class="badge badge--${escapeAttr(p.badge)}">${escapeHtml(p.badge === 'coins' ? 'AceCoins' : (p.badge === 'vehicles' ? 'Blindé' : 'Service'))}</span>
-          </div>
-        </div>
-      </article>
-    `;
-  }).join("");
-
-  grid.querySelectorAll("[data-product-id]").forEach((card) => {
-    const pick = () => setSelectedProduct(card.dataset.productId);
-    card.addEventListener("click", pick);
-    card.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        pick();
-      }
-    });
+function paintStars(container, value) {
+  const stars = [...container.querySelectorAll("button[data-star]")];
+  stars.forEach((btn) => {
+    const s = Number(btn.dataset.star);
+    btn.classList.toggle("active", s <= value);
+    btn.innerHTML = starSvg(s <= value);
   });
+}
+
+function renderStars(container) {
+  container.innerHTML = "";
+  for (let i = 1; i <= 5; i++) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "star";
+    btn.dataset.star = String(i);
+    btn.innerHTML = starSvg(false);
+
+    btn.addEventListener("mouseenter", () => paintStars(container, i));
+    btn.addEventListener("mouseleave", () => paintStars(container, selectedStars));
+    btn.addEventListener("click", () => {
+      selectedStars = i;
+      paintStars(container, selectedStars);
+      const label = $("#starsValue");
+      if (label) label.textContent = `${selectedStars}/5`;
+    });
+
+    container.appendChild(btn);
+  }
+  paintStars(container, selectedStars);
 }
 
 function setSelectedProduct(id) {
   selectedProductId = id;
-  document.querySelectorAll(".pCard").forEach((el) => el.classList.toggle("is-active", el.dataset.productId === id));
-  setMsg("");
+  const cards = [...document.querySelectorAll("[data-product-id]")];
+  cards.forEach((c) => c.classList.toggle("selected", c.dataset.productId === id));
+
+  const p = PRODUCTS.find((x) => x.id === id);
+  const previewImg = $("#selectedImage");
+  const previewName = $("#selectedName");
+
+  if (previewImg && p) {
+    previewImg.src = p.image;
+    previewImg.alt = p.name;
+  }
+  if (previewName && p) {
+    previewName.textContent = p.name;
+  }
 }
 
-function renderStars() {
-  const wrap = document.getElementById("stars");
-  wrap.innerHTML = Array.from({ length: 5 }).map((_, i) => {
-    const v = i + 1;
-    return `
-      <button class="starBtn" type="button" data-star="${v}" aria-label="${v} étoile${v > 1 ? 's' : ''}">
-        ${starSvg()}
-      </button>
+function renderProducts() {
+  const wrap = $("#products");
+  if (!wrap) return;
+
+  wrap.innerHTML = "";
+  PRODUCTS.forEach((p) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "productCard";
+    card.dataset.productId = p.id;
+
+    card.innerHTML = `
+      <div class="productImgWrap">
+        <img class="productImg" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">
+      </div>
+      <div class="productMeta">
+        <div class="productTitle">${escapeHtml(p.name)}</div>
+      </div>
     `;
-  }).join("");
 
-  wrap.querySelectorAll("[data-star]").forEach((btn) => {
-    const v = Number(btn.dataset.star);
-
-    btn.addEventListener("mouseenter", () => {
-      hotStars = v;
-      paintStars();
-    });
-
-    btn.addEventListener("mouseleave", () => {
-      hotStars = 0;
-      paintStars();
-    });
-
-    btn.addEventListener("click", () => {
-      selectedStars = v;
-      hotStars = 0;
-      paintStars();
-      document.getElementById("rateHint").textContent = `${selectedStars}/5`;
-      setMsg("");
-    });
+    card.addEventListener("click", () => setSelectedProduct(p.id));
+    wrap.appendChild(card);
   });
 
-  paintStars();
-}
-
-function paintStars() {
-  const on = hotStars || selectedStars;
-  document.querySelectorAll(".starBtn").forEach((btn) => {
-    const v = Number(btn.dataset.star);
-    btn.classList.toggle("is-on", v <= on);
-    btn.classList.toggle("is-hot", hotStars && v <= hotStars);
-  });
+  setSelectedProduct(PRODUCTS[0]?.id || null);
 }
 
 async function submitRating() {
-  const btn = document.getElementById("submitBtn");
-  const comment = (document.getElementById("comment").value || "").trim();
-
   if (!selectedProductId) {
     setMsg("Choisissez un article.");
     return;
@@ -142,11 +156,16 @@ async function submitRating() {
     return;
   }
 
-  btn.disabled = true;
+  const btn = $("#submitBtn");
+  const commentEl = $("#comment");
+  const comment = (commentEl?.value || "").trim();
+
+  if (btn) btn.disabled = true;
   setMsg("Envoi en cours...");
 
   try {
-    const res = await fetch(`${WORKER_API_BASE.replace(/\/$/, "https://acepvp-ratings.ryzcoofficiel.workers.dev")}/rate`, {
+    const url = `${WORKER_API_BASE.replace(/\/$/, "")}/rate`;
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -159,39 +178,33 @@ async function submitRating() {
 
     if (!res.ok) {
       const t = await safeText(res);
-      throw new Error(t || "Erreur serveur");
+      throw new Error(t || `HTTP ${res.status}`);
     }
 
-    try { localStorage.setItem(LS_KEY, JSON.stringify({ ok: true, at: Date.now(), itemId: product.id })); } catch (e) {}
-    location.replace("merci.html");
+    markSent(product.id);
+    window.location.replace("merci.html");
   } catch (e) {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
     setMsg("Impossible d'envoyer la note. Réessayez.");
   }
 }
 
-function setMsg(text) {
-  const el = document.getElementById("msg");
-  if (el) el.textContent = text;
+function init() {
+  if (alreadySent()) {
+    window.location.replace("merci.html");
+    return;
+  }
+
+  renderProducts();
+
+  const starsWrap = $("#stars");
+  if (starsWrap) renderStars(starsWrap);
+
+  const btn = $("#submitBtn");
+  if (btn) btn.addEventListener("click", submitRating);
+
+  const label = $("#starsValue");
+  if (label) label.textContent = "0/5";
 }
 
-function starSvg() {
-  return `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
-}
-
-function escapeHtml(s) {
-  return String(s)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function escapeAttr(s) {
-  return escapeHtml(s).replaceAll("`", "&#96;");
-}
-
-async function safeText(res) {
-  try { return await res.text(); } catch { return ""; }
-}
+document.addEventListener("DOMContentLoaded", init);
